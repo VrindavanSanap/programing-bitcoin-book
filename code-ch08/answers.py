@@ -1,4 +1,4 @@
-'''
+"""
 # tag::exercise4[]
 ==== Exercise 4
 
@@ -50,166 +50,167 @@ bdbd4bb7152ae'
 True
 
 # end::answer4[]
-'''
+"""
 
 from io import BytesIO
 from unittest import TestCase
 
 import helper
 import op
-
 from ecc import S256Point, Signature
-from helper import (
-    encode_base58_checksum,
-    encode_varint,
-    hash256,
-    int_to_little_endian,
-)
+from helper import (encode_base58_checksum, encode_varint, hash256,
+                    int_to_little_endian)
 from op import decode_num, encode_num
 from script import Script
-from tx import Tx, TxIn, SIGHASH_ALL
+from tx import SIGHASH_ALL, Tx, TxIn
 
-
-'''
+"""
 # tag::exercise1[]
 ==== Exercise 1
 
 Write the `op_checkmultisig` function of _op.py_.
 # end::exercise1[]
-'''
+"""
 
 
 # tag::answer1[]
 def op_checkmultisig(stack, z):
-    if len(stack) < 1:
+  if len(stack) < 1:
+    return False
+  n = decode_num(stack.pop())
+  if len(stack) < n + 1:
+    return False
+  sec_pubkeys = []
+  for _ in range(n):
+    sec_pubkeys.append(stack.pop())
+  m = decode_num(stack.pop())
+  if len(stack) < m + 1:
+    return False
+  der_signatures = []
+  for _ in range(m):
+    der_signatures.append(stack.pop()[:-1])
+  stack.pop()
+  try:
+    points = [S256Point.parse(sec) for sec in sec_pubkeys]
+    sigs = [Signature.parse(der) for der in der_signatures]
+    for sig in sigs:
+      if len(points) == 0:
         return False
-    n = decode_num(stack.pop())
-    if len(stack) < n + 1:
-        return False
-    sec_pubkeys = []
-    for _ in range(n):
-        sec_pubkeys.append(stack.pop())
-    m = decode_num(stack.pop())
-    if len(stack) < m + 1:
-        return False
-    der_signatures = []
-    for _ in range(m):
-        der_signatures.append(stack.pop()[:-1])
-    stack.pop()
-    try:
-        points = [S256Point.parse(sec) for sec in sec_pubkeys]
-        sigs = [Signature.parse(der) for der in der_signatures]
-        for sig in sigs:
-            if len(points) == 0:
-                return False
-            while points:
-                point = points.pop(0)
-                if point.verify(z, sig):
-                    break
-        stack.append(encode_num(1))
-    except (ValueError, SyntaxError):
-        return False
-    return True
+      while points:
+        point = points.pop(0)
+        if point.verify(z, sig):
+          break
+    stack.append(encode_num(1))
+  except (ValueError, SyntaxError):
+    return False
+  return True
+
+
 # end::answer1[]
 
 
-'''
+"""
 # tag::exercise2[]
 ==== Exercise 2
 
 Write the `h160_to_p2pkh_address` function that converts a 20-byte hash160 into a p2pkh address.
 # end::exercise2[]
-'''
+"""
 
 
 # tag::answer2[]
 def h160_to_p2pkh_address(h160, testnet=False):
-    if testnet:
-        prefix = b'\x6f'
-    else:
-        prefix = b'\x00'
-    return encode_base58_checksum(prefix + h160)
+  if testnet:
+    prefix = b"\x6f"
+  else:
+    prefix = b"\x00"
+  return encode_base58_checksum(prefix + h160)
+
+
 # end::answer2[]
 
 
-'''
+"""
 # tag::exercise3[]
 ==== Exercise 3
 
 Write the `h160_to_p2sh_address` function that converts a 20-byte hash160 into a p2sh address.
 # end::exercise3[]
-'''
+"""
 
 
 # tag::answer3[]
 def h160_to_p2sh_address(h160, testnet=False):
-    if testnet:
-        prefix = b'\xc4'
-    else:
-        prefix = b'\x05'
-    return encode_base58_checksum(prefix + h160)
+  if testnet:
+    prefix = b"\xc4"
+  else:
+    prefix = b"\x05"
+  return encode_base58_checksum(prefix + h160)
+
+
 # end::answer3[]
 
 
-'''
+"""
 # tag::exercise5[]
 ==== Exercise 5
 
 Modify the `sig_hash` and `verify_input` methods to be able to verify p2sh pass:[<span class="keep-together">transactions</span>].
 # end::exercise5[]
-'''
+"""
 
 
 # tag::answer5[]
 def sig_hash(self, input_index, redeem_script=None):
-    '''Returns the integer representation of the hash that needs to get
-    signed for index input_index'''
-    s = int_to_little_endian(self.version, 4)
-    s += encode_varint(len(self.tx_ins))
-    for i, tx_in in enumerate(self.tx_ins):
-        if i == input_index:
-            if redeem_script:
-                script_sig = redeem_script
-            else:
-                script_sig = tx_in.script_pubkey(self.testnet)
-        else:
-            script_sig = None
-        s += TxIn(
-            prev_tx=tx_in.prev_tx,
-            prev_index=tx_in.prev_index,
-            script_sig=script_sig,
-            sequence=tx_in.sequence,
-        ).serialize()
-    s += encode_varint(len(self.tx_outs))
-    for tx_out in self.tx_outs:
-        s += tx_out.serialize()
-    s += int_to_little_endian(self.locktime, 4)
-    s += int_to_little_endian(SIGHASH_ALL, 4)
-    h256 = hash256(s)
-    return int.from_bytes(h256, 'big')
+  """Returns the integer representation of the hash that needs to get
+  signed for index input_index"""
+  s = int_to_little_endian(self.version, 4)
+  s += encode_varint(len(self.tx_ins))
+  for i, tx_in in enumerate(self.tx_ins):
+    if i == input_index:
+      if redeem_script:
+        script_sig = redeem_script
+      else:
+        script_sig = tx_in.script_pubkey(self.testnet)
+    else:
+      script_sig = None
+    s += TxIn(
+      prev_tx=tx_in.prev_tx,
+      prev_index=tx_in.prev_index,
+      script_sig=script_sig,
+      sequence=tx_in.sequence,
+    ).serialize()
+  s += encode_varint(len(self.tx_outs))
+  for tx_out in self.tx_outs:
+    s += tx_out.serialize()
+  s += int_to_little_endian(self.locktime, 4)
+  s += int_to_little_endian(SIGHASH_ALL, 4)
+  h256 = hash256(s)
+  return int.from_bytes(h256, "big")
 
 
 def verify_input(self, input_index):
-    tx_in = self.tx_ins[input_index]
-    script_pubkey = tx_in.script_pubkey(testnet=self.testnet)
-    if script_pubkey.is_p2sh_script_pubkey():
-        cmd = tx_in.script_sig.cmds[-1]
-        raw_redeem = encode_varint(len(cmd)) + cmd
-        redeem_script = Script.parse(BytesIO(raw_redeem))
-    else:
-        redeem_script = None
-    z = self.sig_hash(input_index, redeem_script)
-    combined = tx_in.script_sig + script_pubkey
-    return combined.evaluate(z)
+  tx_in = self.tx_ins[input_index]
+  script_pubkey = tx_in.script_pubkey(testnet=self.testnet)
+  if script_pubkey.is_p2sh_script_pubkey():
+    cmd = tx_in.script_sig.cmds[-1]
+    raw_redeem = encode_varint(len(cmd)) + cmd
+    redeem_script = Script.parse(BytesIO(raw_redeem))
+  else:
+    redeem_script = None
+  z = self.sig_hash(input_index, redeem_script)
+  combined = tx_in.script_sig + script_pubkey
+  return combined.evaluate(z)
+
+
 # end::answer5[]
 
 
 class ChapterTest(TestCase):
-
-    def test_apply(self):
-        op.op_checkmultisig = op_checkmultisig
-        op.OP_CODE_FUNCTIONS[174] = op_checkmultisig
-        helper.h160_to_p2pkh_address = h160_to_p2pkh_address
-        helper.h160_to_p2sh_address = h160_to_p2sh_address
-        Tx.sig_hash = sig_hash
-        Tx.verify_input = verify_input
+  def test_apply(self):
+    op.op_checkmultisig = op_checkmultisig
+    op.OP_CODE_FUNCTIONS[174] = op_checkmultisig
+    helper.h160_to_p2pkh_address = h160_to_p2pkh_address
+    helper.h160_to_p2sh_address = h160_to_p2sh_address
+    Tx.sig_hash = sig_hash
+    Tx.verify_input = verify_input

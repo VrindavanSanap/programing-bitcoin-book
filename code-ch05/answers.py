@@ -1,4 +1,4 @@
-'''
+"""
 # tag::exercise5[]
 ==== Exercise 5
 
@@ -59,8 +59,7 @@ OP_EQUALVERIFY OP_CHECKSIG
 40000000
 
 # end::answer5[]
-'''
-
+"""
 
 from unittest import TestCase
 
@@ -68,11 +67,10 @@ from helper import little_endian_to_int, read_varint
 from script import Script
 from tx import Tx, TxIn, TxOut
 
-
 methods = []
 
 
-'''
+"""
 # tag::exercise1[]
 ==== Exercise 1
 
@@ -99,27 +97,29 @@ Write the inputs parsing part of the `parse` method in `Tx` and the `parse` meth
             inputs.append(TxIn.parse(s))
         return cls(version, inputs, None, None, testnet=testnet)
 # end::answer2.1[]
-'''
+"""
 
 
 # tag::answer2.2[]
 @classmethod
 def parse(cls, s):
-    '''Takes a byte stream and parses the tx_input at the start.
-    Returns a TxIn object.
-    '''
-    prev_tx = s.read(32)[::-1]
-    prev_index = little_endian_to_int(s.read(4))
-    script_sig = Script.parse(s)
-    sequence = little_endian_to_int(s.read(4))
-    return cls(prev_tx, prev_index, script_sig, sequence)
+  """Takes a byte stream and parses the tx_input at the start.
+  Returns a TxIn object.
+  """
+  prev_tx = s.read(32)[::-1]
+  prev_index = little_endian_to_int(s.read(4))
+  script_sig = Script.parse(s)
+  sequence = little_endian_to_int(s.read(4))
+  return cls(prev_tx, prev_index, script_sig, sequence)
+
+
 # end::answer2.2[]
 
 
 methods.append(parse)
 
 
-'''
+"""
 # tag::exercise3[]
 ==== Exercise 3
 
@@ -141,77 +141,82 @@ class Tx:
             outputs.append(TxOut.parse(s))
         return cls(version, inputs, outputs, None, testnet=testnet)
 # end::answer3.1[]
-'''
+"""
 
 
 # tag::answer3.2[]
 @classmethod
 def parse(cls, s):
-    '''Takes a byte stream and parses the tx_output at the start.
-    Returns a TxOut object.
-    '''
-    amount = little_endian_to_int(s.read(8))
-    script_pubkey = Script.parse(s)
-    return cls(amount, script_pubkey)
+  """Takes a byte stream and parses the tx_output at the start.
+  Returns a TxOut object.
+  """
+  amount = little_endian_to_int(s.read(8))
+  script_pubkey = Script.parse(s)
+  return cls(amount, script_pubkey)
+
+
 # end::answer3.2[]
 
 
 methods.append(parse)
 
 
-'''
+"""
 # tag::exercise4[]
 ==== Exercise 4
 
 Write the locktime parsing part of the `parse` method in `Tx`.
 # end::exercise4[]
-'''
+"""
 
 
 # tag::answer4[]
 @classmethod
 def parse(cls, s, testnet=False):
-    version = little_endian_to_int(s.read(4))
-    num_inputs = read_varint(s)
-    inputs = []
-    for _ in range(num_inputs):
-        inputs.append(TxIn.parse(s))
-    num_outputs = read_varint(s)
-    outputs = []
-    for _ in range(num_outputs):
-        outputs.append(TxOut.parse(s))
-    locktime = little_endian_to_int(s.read(4))
-    return cls(version, inputs, outputs, locktime, testnet=testnet)
+  version = little_endian_to_int(s.read(4))
+  num_inputs = read_varint(s)
+  inputs = []
+  for _ in range(num_inputs):
+    inputs.append(TxIn.parse(s))
+  num_outputs = read_varint(s)
+  outputs = []
+  for _ in range(num_outputs):
+    outputs.append(TxOut.parse(s))
+  locktime = little_endian_to_int(s.read(4))
+  return cls(version, inputs, outputs, locktime, testnet=testnet)
+
+
 # end::answer4[]
 
 
 methods.append(parse)
 
 
-'''
+"""
 # tag::exercise6[]
 ==== Exercise 6
 
 Write the `fee` method for the `Tx` class.
 # end::exercise6[]
-'''
+"""
 
 
 # tag::answer6[]
 def fee(self, testnet=False):
-    input_sum, output_sum = 0, 0
-    for tx_in in self.tx_ins:
-        input_sum += tx_in.value(testnet=testnet)
-    for tx_out in self.tx_outs:
-        output_sum += tx_out.amount
-    return input_sum - output_sum
+  input_sum, output_sum = 0, 0
+  for tx_in in self.tx_ins:
+    input_sum += tx_in.value(testnet=testnet)
+  for tx_out in self.tx_outs:
+    output_sum += tx_out.amount
+  return input_sum - output_sum
+
+
 # end::answer6[]
 
 
 class ChapterTest(TestCase):
-
-    def test_apply(self):
-        TxIn.parse = methods[0]
-        TxOut.parse = methods[1]
-        Tx.parse = methods[2]
-        Tx.fee = fee
+  def test_apply(self):
+    TxIn.parse = methods[0]
+    TxOut.parse = methods[1]
+    Tx.parse = methods[2]
+    Tx.fee = fee

@@ -1,4 +1,4 @@
-'''
+"""
 # tag::exercise3[]
 ==== Exercise 3
 
@@ -73,71 +73,70 @@ a82be331fea48037b8b5d71f0e332edf93ac3500eb4ddc0decc1a864790c782c76215660dd3097\
 True
 
 # end::answer4[]
-'''
-
+"""
 
 from unittest import TestCase
 
 import op
-
 from ecc import S256Point, Signature
 from helper import hash160
 from op import encode_num
 
-
-'''
+"""
 # tag::exercise1[]
 ==== Exercise 1
 
 Write the `op_hash160` function.
 # end::exercise1[]
-'''
+"""
 
 
 # tag::answer1[]
 def op_hash160(stack):
-    if len(stack) < 1:
-        return False
-    element = stack.pop()
-    h160 = hash160(element)
-    stack.append(h160)
-    return True
+  if len(stack) < 1:
+    return False
+  element = stack.pop()
+  h160 = hash160(element)
+  stack.append(h160)
+  return True
+
+
 # end::answer1[]
 
 
-'''
+"""
 # tag::exercise2[]
 ==== Exercise 2
 
 Write the `op_checksig` function in _op.py_.
 # end::exercise2[]
-'''
+"""
 
 
 # tag::answer2[]
 def op_checksig(stack, z):
-    if len(stack) < 2:
-        return False
-    sec_pubkey = stack.pop()
-    der_signature = stack.pop()[:-1]
-    try:
-        point = S256Point.parse(sec_pubkey)
-        sig = Signature.parse(der_signature)
-    except (ValueError, SyntaxError) as e:
-        return False
-    if point.verify(z, sig):
-        stack.append(encode_num(1))
-    else:
-        stack.append(encode_num(0))
-    return True
+  if len(stack) < 2:
+    return False
+  sec_pubkey = stack.pop()
+  der_signature = stack.pop()[:-1]
+  try:
+    point = S256Point.parse(sec_pubkey)
+    sig = Signature.parse(der_signature)
+  except (ValueError, SyntaxError) as e:
+    return False
+  if point.verify(z, sig):
+    stack.append(encode_num(1))
+  else:
+    stack.append(encode_num(0))
+  return True
+
+
 # end::answer2[]
 
 
 class ChapterTest(TestCase):
-
-    def test_apply(self):
-
-        op.op_hash160 = op_hash160
-        op.op_checksig = op_checksig
-        op.OP_CODE_FUNCTIONS[0xa9] = op_hash160
-        op.OP_CODE_FUNCTIONS[0xac] = op_checksig
+  def test_apply(self):
+    op.op_hash160 = op_hash160
+    op.op_checksig = op_checksig
+    op.OP_CODE_FUNCTIONS[0xA9] = op_hash160
+    op.OP_CODE_FUNCTIONS[0xAC] = op_checksig

@@ -1,4 +1,4 @@
-'''
+"""
 # tag::exercise1[]
 ==== Exercise 1
 
@@ -148,50 +148,51 @@ Create a testnet address for yourself using a long secret that only you know. Th
 mft9LRNtaBNtpkknB8xgm17UvPedZ4ecYL
 
 # end::answer9[]
-'''
-
+"""
 
 from unittest import TestCase
 
 import helper
 
-
-'''
+"""
 # tag::exercise7[]
 ==== Exercise 7
 
 Write a function `little_endian_to_int` that takes Python bytes, interprets those bytes in little-endian, and returns the number.
 # end::exercise7[]
-'''
+"""
 
 
 # tag::answer7[]
 def little_endian_to_int(b):
-    '''little_endian_to_int takes byte sequence as a little-endian number.
-    Returns an integer'''
-    return int.from_bytes(b, 'little')
+  """little_endian_to_int takes byte sequence as a little-endian number.
+  Returns an integer"""
+  return int.from_bytes(b, "little")
+
+
 # end::answer7[]
 
 
-'''
+"""
 # tag::exercise8[]
 ==== Exercise 8
 
 Write a function `int_to_little_endian` that does the reverse of the last exercise.
 # end::exercise8[]
-'''
+"""
 
 
 # tag::answer8[]
 def int_to_little_endian(n, length):
-    '''endian_to_little_endian takes an integer and returns the little-endian
-    byte sequence of length'''
-    return n.to_bytes(length, 'little')
+  """endian_to_little_endian takes an integer and returns the little-endian
+  byte sequence of length"""
+  return n.to_bytes(length, "little")
+
+
 # end::answer8[]
 
 
 class ChapterTest(TestCase):
-
-    def test_apply(self):
-        helper.little_endian_to_int = little_endian_to_int
-        helper.int_to_little_endian = int_to_little_endian
+  def test_apply(self):
+    helper.little_endian_to_int = little_endian_to_int
+    helper.int_to_little_endian = int_to_little_endian

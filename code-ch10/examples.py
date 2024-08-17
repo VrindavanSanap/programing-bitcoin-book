@@ -1,4 +1,4 @@
-'''
+"""
 # tag::example1[]
 >>> from io import BytesIO
 >>> from network import SimpleNode, GetHeadersMessage, HeadersMessage
@@ -48,4 +48,4 @@ ffff001d
 71be001d
 
 # end::example1[]
-'''
+"""

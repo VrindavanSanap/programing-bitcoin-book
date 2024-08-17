@@ -1,4 +1,4 @@
-'''
+"""
 # tag::example1[]
 >>> from helper import hash256
 >>> bit_field_size = 10  # <1>
@@ -95,4 +95,4 @@ False)
 found: e3930e1e566ca9b75d53b0eb9acb7607f547e1182d1d22bd4b661cfe18dcddf1:0
 
 # end::example5[]
-'''
+"""

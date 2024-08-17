@@ -1,4 +1,4 @@
-'''
+"""
 # tag::exercise4[]
 ==== Exercise 4
 
@@ -90,100 +90,98 @@ d9555f7146861a8298b7636be8b292090a224c5dc84268480d8be1012103935581e52c354cd2f4\
 14ad346f8eb57dee9a37981716e498120ae80e44f788ac00000000
 
 # end::answer5[]
-'''
-
+"""
 
 from unittest import TestCase
 
-from helper import (
-    encode_varint,
-    hash256,
-    int_to_little_endian,
-    SIGHASH_ALL,
-)
+from helper import SIGHASH_ALL, encode_varint, hash256, int_to_little_endian
 from script import Script
 from tx import Tx, TxIn
 
-
-'''
+"""
 # tag::exercise1[]
 ==== Exercise 1
 
 Write the `sig_hash` method for the `Tx` class.
 # end::exercise1[]
-'''
+"""
 
 
 # tag::answer1[]
 def sig_hash(self, input_index):
-    s = int_to_little_endian(self.version, 4)
-    s += encode_varint(len(self.tx_ins))
-    for i, tx_in in enumerate(self.tx_ins):
-        if i == input_index:
-            s += TxIn(
-                prev_tx=tx_in.prev_tx,
-                prev_index=tx_in.prev_index,
-                script_sig=tx_in.script_pubkey(self.testnet),
-                sequence=tx_in.sequence,
-            ).serialize()
-        else:
-            s += TxIn(
-                prev_tx=tx_in.prev_tx,
-                prev_index=tx_in.prev_index,
-                sequence=tx_in.sequence,
-            ).serialize()
-    s += encode_varint(len(self.tx_outs))
-    for tx_out in self.tx_outs:
-        s += tx_out.serialize()
-    s += int_to_little_endian(self.locktime, 4)
-    s += int_to_little_endian(SIGHASH_ALL, 4)
-    h256 = hash256(s)
-    return int.from_bytes(h256, 'big')
+  s = int_to_little_endian(self.version, 4)
+  s += encode_varint(len(self.tx_ins))
+  for i, tx_in in enumerate(self.tx_ins):
+    if i == input_index:
+      s += TxIn(
+        prev_tx=tx_in.prev_tx,
+        prev_index=tx_in.prev_index,
+        script_sig=tx_in.script_pubkey(self.testnet),
+        sequence=tx_in.sequence,
+      ).serialize()
+    else:
+      s += TxIn(
+        prev_tx=tx_in.prev_tx,
+        prev_index=tx_in.prev_index,
+        sequence=tx_in.sequence,
+      ).serialize()
+  s += encode_varint(len(self.tx_outs))
+  for tx_out in self.tx_outs:
+    s += tx_out.serialize()
+  s += int_to_little_endian(self.locktime, 4)
+  s += int_to_little_endian(SIGHASH_ALL, 4)
+  h256 = hash256(s)
+  return int.from_bytes(h256, "big")
+
+
 # end::answer1[]
 
 
-'''
+"""
 # tag::exercise2[]
 ==== Exercise 2
 
 Write the `verify_input` method for the `Tx` class. You will want to use the `TxIn.script_pubkey`, `Tx.sig_hash`, and `Script.evaluate` methods.
 # end::exercise2[]
-'''
+"""
 
 
 # tag::answer2[]
 def verify_input(self, input_index):
-    tx_in = self.tx_ins[input_index]
-    script_pubkey = tx_in.script_pubkey(testnet=self.testnet)
-    z = self.sig_hash(input_index)
-    combined = tx_in.script_sig + script_pubkey
-    return combined.evaluate(z)
+  tx_in = self.tx_ins[input_index]
+  script_pubkey = tx_in.script_pubkey(testnet=self.testnet)
+  z = self.sig_hash(input_index)
+  combined = tx_in.script_sig + script_pubkey
+  return combined.evaluate(z)
+
+
 # end::answer2[]
 
 
-'''
+"""
 # tag::exercise3[]
 ==== Exercise 3
 
 Write the `sign_input` method for the `Tx` class.
 # end::exercise3[]
-'''
+"""
 
 
 # tag::answer3[]
 def sign_input(self, input_index, private_key):
-    z = self.sig_hash(input_index)
-    der = private_key.sign(z).der()
-    sig = der + SIGHASH_ALL.to_bytes(1, 'big')
-    sec = private_key.point.sec()
-    self.tx_ins[input_index].script_sig = Script([sig, sec])
-    return self.verify_input(input_index)
+  z = self.sig_hash(input_index)
+  der = private_key.sign(z).der()
+  sig = der + SIGHASH_ALL.to_bytes(1, "big")
+  sec = private_key.point.sec()
+  self.tx_ins[input_index].script_sig = Script([sig, sec])
+  return self.verify_input(input_index)
+
+
 # end::answer3[]
 
 
 class ChapterTest(TestCase):
-
-    def test_apply(self):
-        Tx.sig_hash = sig_hash
-        Tx.verify_input = verify_input
-        Tx.sign_input = sign_input
+  def test_apply(self):
+    Tx.sig_hash = sig_hash
+    Tx.verify_input = verify_input
+    Tx.sign_input = sign_input

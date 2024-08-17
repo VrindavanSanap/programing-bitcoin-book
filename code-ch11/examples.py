@@ -1,4 +1,4 @@
-'''
+"""
 # tag::example1[]
 >>> from helper import hash256
 >>> hash0 = bytes.fromhex('c117ea8ec828342f4dfb0ad6bd140e03a50720ece40169ee38b\
@@ -231,4 +231,4 @@ ea6d7ac1..., 45774386..., 76880292..., b1ae7f15..., 9b74f89f..., b3a92b5b..., \
 b5c0b915..., c9d52c5c..., c555bc5f..., f9dbfafc..., 38faf8c8...
 
 # end::example8[]
-'''
+"""

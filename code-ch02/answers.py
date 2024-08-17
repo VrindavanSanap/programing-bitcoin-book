@@ -1,4 +1,4 @@
-'''
+"""
 # tag::exercise1[]
 ==== Exercise 1
 
@@ -53,30 +53,30 @@ For the curve __y__^2^ = __x__^3^ + 5__x__ + 7, what is (–1,–1) + (–1,–1
 18.0 77.0
 
 # end::answer6[]
-'''
-
+"""
 
 from unittest import TestCase
 
 from ecc import Point
 
-
-'''
+"""
 # tag::exercise2[]
 ==== Exercise 2
 
 Write the `__ne__` method for `Point`.
 # end::exercise2[]
-'''
+"""
 
 
 # tag::answer2[]
 def __ne__(self, other):
-    return not (self == other)
+  return not (self == other)
+
+
 # end::answer2[]
 
 
-'''
+"""
 # tag::exercise3[]
 ==== Exercise 3
 
@@ -92,40 +92,39 @@ Write the `__add__` method where __x__~1~ ≠ __x__~2~.
 
 Write the `__add__` method when __P__~1~ = __P__~2~.
 # end::exercise7[]
-'''
+"""
 
 
 def __add__(self, other):
-    if self.a != other.a or self.b != other.b:
-        raise TypeError
-    if self.x is None:
-        return other
-    if other.x is None:
-        return self
-    # tag::answer3[]
-    if self.x == other.x and self.y != other.y:
-        return self.__class__(None, None, self.a, self.b)
-    # end::answer3[]
-    # tag::answer5[]
-    if self.x != other.x:
-        s = (other.y - self.y) / (other.x - self.x)
-        x = s**2 - self.x - other.x
-        y = s * (self.x - x) - self.y
-        return self.__class__(x, y, self.a, self.b)
-    # end::answer5[]
-    if self == other and self.y == 0 * self.x:
-        return self.__class__(None, None, self.a, self.b)
-    # tag::answer7[]
-    if self == other:
-        s = (3 * self.x**2 + self.a) / (2 * self.y)
-        x = s**2 - 2 * self.x
-        y = s * (self.x - x) - self.y
-        return self.__class__(x, y, self.a, self.b)
-    # end::answer7[]
+  if self.a != other.a or self.b != other.b:
+    raise TypeError
+  if self.x is None:
+    return other
+  if other.x is None:
+    return self
+  # tag::answer3[]
+  if self.x == other.x and self.y != other.y:
+    return self.__class__(None, None, self.a, self.b)
+  # end::answer3[]
+  # tag::answer5[]
+  if self.x != other.x:
+    s = (other.y - self.y) / (other.x - self.x)
+    x = s**2 - self.x - other.x
+    y = s * (self.x - x) - self.y
+    return self.__class__(x, y, self.a, self.b)
+  # end::answer5[]
+  if self == other and self.y == 0 * self.x:
+    return self.__class__(None, None, self.a, self.b)
+  # tag::answer7[]
+  if self == other:
+    s = (3 * self.x**2 + self.a) / (2 * self.y)
+    x = s**2 - 2 * self.x
+    y = s * (self.x - x) - self.y
+    return self.__class__(x, y, self.a, self.b)
+  # end::answer7[]
 
 
 class ChapterTest(TestCase):
-
-    def test_apply(self):
-        Point.__ne__ = __ne__
-        Point.__add__ = __add__
+  def test_apply(self):
+    Point.__ne__ = __ne__
+    Point.__add__ = __add__

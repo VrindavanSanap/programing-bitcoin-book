@@ -1,4 +1,4 @@
-'''
+"""
 # tag::exercise1[]
 ==== Exercise 1
 
@@ -181,84 +181,80 @@ e500000000001976a914ad346f8eb57dee9a37981716e498120ae80e44f788ac00000000
 success!
 
 # end::answer6[]
-'''
-
+"""
 
 from unittest import TestCase
 
-from bloomfilter import BloomFilter, BIP37_CONSTANT
-from helper import (
-    encode_varint,
-    int_to_little_endian,
-    murmur3,
-)
-from network import (
-    GenericMessage,
-    GetDataMessage,
-)
+from bloomfilter import BIP37_CONSTANT, BloomFilter
+from helper import encode_varint, int_to_little_endian, murmur3
+from network import GenericMessage, GetDataMessage
 
-
-'''
+"""
 # tag::exercise3[]
 ==== Exercise 3
 
 Write the `add` method for `BloomFilter`.
 # end::exercise3[]
-'''
+"""
 
 
 # tag::answer3[]
 def add(self, item):
-    for i in range(self.function_count):
-        seed = i * BIP37_CONSTANT + self.tweak
-        h = murmur3(item, seed=seed)
-        bit = h % (self.size * 8)
-        self.bit_field[bit] = 1
+  for i in range(self.function_count):
+    seed = i * BIP37_CONSTANT + self.tweak
+    h = murmur3(item, seed=seed)
+    bit = h % (self.size * 8)
+    self.bit_field[bit] = 1
+
+
 # end::answer3[]
 
 
-'''
+"""
 # tag::exercise4[]
 ==== Exercise 4
 
 Write the  `filterload` method for the `BloomFilter` class.
 # end::exercise4[]
-'''
+"""
 
 
 # tag::answer4[]
 def filterload(self, flag=1):
-    payload = encode_varint(self.size)
-    payload += self.filter_bytes()
-    payload += int_to_little_endian(self.function_count, 4)
-    payload += int_to_little_endian(self.tweak, 4)
-    payload += int_to_little_endian(flag, 1)
-    return GenericMessage(b'filterload', payload)
+  payload = encode_varint(self.size)
+  payload += self.filter_bytes()
+  payload += int_to_little_endian(self.function_count, 4)
+  payload += int_to_little_endian(self.tweak, 4)
+  payload += int_to_little_endian(flag, 1)
+  return GenericMessage(b"filterload", payload)
+
+
 # end::answer4[]
 
 
-'''
+"""
 # tag::exercise5[]
 ==== Exercise 5
 
 Write the `serialize` method for the `GetDataMessage` class.
 # end::exercise5[]
-'''
+"""
 
 
 # tag::answer5[]
 def serialize(self):
-    result = encode_varint(len(self.data))
-    for data_type, identifier in self.data:
-        result += int_to_little_endian(data_type, 4)
-        result += identifier[::-1]
-    return result
+  result = encode_varint(len(self.data))
+  for data_type, identifier in self.data:
+    result += int_to_little_endian(data_type, 4)
+    result += identifier[::-1]
+  return result
+
+
 # end::answer5[]
 
 
 class ChapterTest(TestCase):
-
-    def test_apply(self):
-        BloomFilter.add = add
-        BloomFilter.filterload = filterload
-        GetDataMessage.serialize = serialize
+  def test_apply(self):
+    BloomFilter.add = add
+    BloomFilter.filterload = filterload
+    GetDataMessage.serialize = serialize

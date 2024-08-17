@@ -1,4 +1,4 @@
-'''
+"""
 # tag::example1[]
 >>> from io import BytesIO
 >>> from script import Script
@@ -104,4 +104,4 @@ d5168fb3586f7613dcc5cd89675b0100000000000000002e37b144c0baced07eb7e7b64da916cd\
 0000000000000000007615000000000000000000000000000000000000000000
 
 # end::example9[]
-'''
+"""
